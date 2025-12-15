@@ -1,0 +1,6 @@
+scipy
+sounddevice
+black
+isort
+flake8
+jsonschema_typed

@@ -1,0 +1,17 @@
+version: "3.8"
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ../:/app
+      - /mnt/wslg:/mnt/wslg
+    environment:
+      - PULSE_SERVER=/mnt/wslg/PulseServer
+    command: sleep infinity
+    networks:
+      - localnet
+
+networks:
+  localnet:
