@@ -3,4 +3,5 @@ sounddevice
 black
 isort
 flake8
-jsonschema_typed
+pydantic
+datamodel-code-generator
