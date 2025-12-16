@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "weekly_schedule",
+  "description": "各曜日の時間設定",
+  "type": "array",
+  "items": {
+    "type": "array",
+    "title": "hour_settings",
+    "description": "時間毎の設定",
+    "items": {
+      "type": "object",
+      "properties": {
+        "hour": {
+          "type": "number",
+          "title": "hour",
+          "description": "時間 (0-23)"
+        }
+      },
+      "required": ["hour"]
+    }
+  }
+}
