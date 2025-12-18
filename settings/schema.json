@@ -17,6 +17,10 @@
         }
       },
       "required": ["hour"]
-    }
-  }
+    },
+    "minItems": 0,
+    "maxItems": 24
+  },
+  "minItems": 7,
+  "maxItems": 7
 }
