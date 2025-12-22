@@ -49,8 +49,6 @@ def should_run(schedule: WeeklyScheduleType, now: datetime.datetime) -> bool:
     hour = now.hour
     minute = now.minute
 
-    print(f"現在時刻: {hour}時{minute}分")
-
     # 現在の時刻に対応する設定を取得する
     hour_settings = next((s for s in today_schedule if s["hour"] == hour), None)
 
