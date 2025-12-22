@@ -20,7 +20,7 @@ def play_sound() -> None:
     # 楽曲の一覧を取得する
     files = glob.glob(f"{SOUND_PATH}/*.wav")
 
-    # ランダムに楽曲を選択して再生する
+    # ランダムに楽曲を選択して読み込む
     fs, data = wavfile.read(random.choice(files))
 
     # 音声を再生する
