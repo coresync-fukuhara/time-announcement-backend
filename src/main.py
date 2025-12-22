@@ -3,12 +3,11 @@ import glob
 import json
 import os
 import random
-from typing import List
 from zoneinfo import ZoneInfo
 
 from scipy.io import wavfile
 import sounddevice as sd
-from schedules_models import HourlyScheduleItemType
+from schedules_models import WeeklyScheduleType
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -28,12 +27,12 @@ def play_sound() -> None:
     sd.wait()
 
 
-def load_schedule(path: str) -> List[List[HourlyScheduleItemType]]:
+def load_schedule(path: str) -> WeeklyScheduleType:
     # スケジュールを読み込む
     with open(path, encoding="utf-8") as f:
         try:
             data = json.load(f)
-            schedules: List[List[HourlyScheduleItemType]] = data
+            schedules: WeeklyScheduleType = data
 
         except json.JSONDecodeError:
             return {}
@@ -41,9 +40,7 @@ def load_schedule(path: str) -> List[List[HourlyScheduleItemType]]:
         return schedules
 
 
-def should_run(
-    schedule: List[List[HourlyScheduleItemType]], now: datetime.datetime
-) -> bool:
+def should_run(schedule: WeeklyScheduleType, now: datetime.datetime) -> bool:
     # 曜日を取得する (0=月曜, 6=日曜)
     weekday = now.weekday() % 7
     # 今日のスケジュールを取得する
