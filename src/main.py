@@ -56,8 +56,11 @@ def should_run(schedule: WeeklyScheduleType, now: datetime.datetime) -> bool:
     if hour_settings is None:
         return False
 
-    # 分が0分でない場合は実行しない
-    if minute != 0:
+    # 分の設定を取得する（存在しない場合は0分とみなす）
+    minites_list = hour_settings.get("minutes", [0])
+
+    # 分の設定に現在の分が含まれていない場合は実行しない
+    if minute not in minites_list:
         return False
 
     return True
