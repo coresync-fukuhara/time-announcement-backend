@@ -13,7 +13,24 @@ from schedules_models import MinuteSettingType, WeeklyScheduleType
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCHEDULE_PATH = os.path.join(BASE_DIR, "settings/schedules.json")
-SOUND_PATH = os.path.join(BASE_DIR, "sounds")
+SOUND_BASE_PATH = os.path.join(BASE_DIR, "sounds")
+USER_SOUND_PATH = os.path.join(SOUND_BASE_PATH, "user")
+DEFAULT_SOUND_PATH = os.path.join(SOUND_BASE_PATH, "default")
+
+
+def _collect_sound_files() -> list[str]:
+    # ユーザーが追加した楽曲（sounds/user/*.wav）を優先する
+    user_files = glob.glob(os.path.join(USER_SOUND_PATH, "*.wav"))
+    if user_files:
+        return user_files
+
+    # ユーザー楽曲がなければ、同梱のデフォルト楽曲（sounds/default/*.wav）を使う
+    default_files = glob.glob(os.path.join(DEFAULT_SOUND_PATH, "*.wav"))
+    if default_files:
+        return default_files
+
+    # 音源が1つもない場合は空リストを返す
+    return []
 
 
 def play_sound(sound_file_path: str) -> None:
@@ -70,7 +87,7 @@ def get_minute_setting(
 
 def get_sound_file(minute_settings: Optional[MinuteSettingType]) -> str:
     # 楽曲の一覧を取得する
-    files = glob.glob(f"{SOUND_PATH}/*.wav")
+    files = _collect_sound_files()
 
     if minute_settings:
         target_file = minute_settings.get("sound_file_name")

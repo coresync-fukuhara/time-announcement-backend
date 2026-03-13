@@ -22,8 +22,10 @@ Linux で `sounddevice` のロードに失敗する場合は、PortAudio 系の�
 
 ### 音源
 
-- `sounds/` 配下の `.wav` を対象にします。
-- 実行時にその中からランダムに1つ選び再生します。
+- デフォルト音源として `sounds/default/` 配下に `.wav` が同梱されています（例: `sounds/default/sample.wav`）。
+- ユーザーは `sounds/user/` 配下に `.wav` ファイルを追加できます。
+  - `sounds/user/` に1つ以上の `.wav` がある場合は、**その中からランダムに1つ**選んで再生します。
+  - `sounds/user/` に `.wav` がない場合は、**`sounds/default/` 配下の `.wav` をランダムに1つ**再生します。
 
 ### スケジュール
 
