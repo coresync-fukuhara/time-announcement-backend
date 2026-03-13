@@ -29,8 +29,10 @@ Linux で `sounddevice` のロードに失敗する場合は、PortAudio 系の�
 
 ### スケジュール
 
-- 設定ファイル: [settings/schedules.json](settings/schedules.json)
+- 設定ファイル: settings/schedules.json
 - 形式: **曜日キー（`monday` 〜 `sunday`）** を持つオブジェクト
+
+[サンプル設定ファイル](settings/sample_schedules.json)を元に設定ファイル (settings/schedules.json) を作成してください。
 
 各時間設定（各曜日の配列要素）は基本的に次のようなオブジェクトです。
 
