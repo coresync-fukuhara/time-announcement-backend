@@ -32,20 +32,35 @@ Linux で `sounddevice` のロードに失敗する場合は、PortAudio 系の�
 - 曜日インデックスは Python の `datetime.weekday()` と同じです。
 	- `0=月, 1=火, ..., 5=土, 6=日`
 
-各時間設定は `{ "hour": 0-23 }` のオブジェクトです。
+各時間設定は `{ "hour": 0-23, "minutes": [0-59,...] }` のオブジェクトです。
+`minutes` は必須で、最低1つ以上の分を指定します（正時のみでよければ `[0]` のように 0 のみを指定します）。
 スキーマは [settings/schema.json](settings/schema.json) にあります。
 
-例（毎日 9時と18時だけ鳴らす）:
+例1（毎日 9時と18時の **0分のみ** 鳴らす）:
 
 ```json
 [
-	[{"hour": 9}, {"hour": 18}],
-	[{"hour": 9}, {"hour": 18}],
-	[{"hour": 9}, {"hour": 18}],
-	[{"hour": 9}, {"hour": 18}],
-	[{"hour": 9}, {"hour": 18}],
-	[{"hour": 9}, {"hour": 18}],
-	[{"hour": 9}, {"hour": 18}]
+	[{"hour": 9, "minutes": [0]}, {"hour": 18, "minutes": [0]}],
+	[{"hour": 9, "minutes": [0]}, {"hour": 18, "minutes": [0]}],
+	[{"hour": 9, "minutes": [0]}, {"hour": 18, "minutes": [0]}],
+	[{"hour": 9, "minutes": [0]}, {"hour": 18, "minutes": [0]}],
+	[{"hour": 9, "minutes": [0]}, {"hour": 18, "minutes": [0]}],
+	[{"hour": 9, "minutes": [0]}, {"hour": 18, "minutes": [0]}],
+	[{"hour": 9, "minutes": [0]}, {"hour": 18, "minutes": [0]}]
+]
+```
+
+例2（毎日 9時と17時の **0分と30分** に鳴らす）:
+
+```json
+[
+	[{"hour": 9, "minutes": [0, 30]}, {"hour": 17, "minutes": [0, 30]}],
+	[{"hour": 9, "minutes": [0, 30]}, {"hour": 17, "minutes": [0, 30]}],
+	[{"hour": 9, "minutes": [0, 30]}, {"hour": 17, "minutes": [0, 30]}],
+	[{"hour": 9, "minutes": [0, 30]}, {"hour": 17, "minutes": [0, 30]}],
+	[{"hour": 9, "minutes": [0, 30]}, {"hour": 17, "minutes": [0, 30]}],
+	[{"hour": 9, "minutes": [0, 30]}, {"hour": 17, "minutes": [0, 30]}],
+	[{"hour": 9, "minutes": [0, 30]}, {"hour": 17, "minutes": [0, 30]}]
 ]
 ```
 

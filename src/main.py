@@ -3,11 +3,12 @@ import glob
 import json
 import os
 import random
+from typing import Optional
 from zoneinfo import ZoneInfo
 
 from scipy.io import wavfile
 import sounddevice as sd
-from schedules_models import WeeklyScheduleType
+from schedules_models import MinuteSettingType, WeeklyScheduleType
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -15,12 +16,9 @@ SCHEDULE_PATH = os.path.join(BASE_DIR, "settings/schedules.json")
 SOUND_PATH = os.path.join(BASE_DIR, "sounds")
 
 
-def play_sound() -> None:
-    # 楽曲の一覧を取得する
-    files = glob.glob(f"{SOUND_PATH}/*.wav")
-
-    # ランダムに楽曲を選択して読み込む
-    fs, data = wavfile.read(random.choice(files))
+def play_sound(sound_file_path: str) -> None:
+    # 音声ファイルを読み込む
+    fs, data = wavfile.read(sound_file_path)
 
     # 音声を再生する
     sd.play(data, fs)
@@ -40,7 +38,9 @@ def load_schedule(path: str) -> WeeklyScheduleType:
         return schedules
 
 
-def should_run(schedule: WeeklyScheduleType, now: datetime.datetime) -> bool:
+def get_minute_setting(
+    schedule: WeeklyScheduleType, now: datetime.datetime
+) -> Optional[MinuteSettingType]:
     # 曜日を取得する (0=月曜, 6=日曜)
     weekday = now.weekday() % 7
     # 今日のスケジュールを取得する
@@ -54,16 +54,32 @@ def should_run(schedule: WeeklyScheduleType, now: datetime.datetime) -> bool:
 
     # 設定が存在しない場合は実行しない
     if hour_settings is None:
-        return False
+        return None
 
-    # 分の設定を取得する（存在しない場合は0分とみなす）
-    minites_list = hour_settings.get("minutes", [0])
+    # 分の設定を取得する
+    minites_list = hour_settings["minutes"]
 
     # 分の設定に現在の分が含まれていない場合は実行しない
     if minute not in minites_list:
-        return False
+        return None
 
-    return True
+    minute_settings = hour_settings.get("minute_settings", {})
+
+    return minute_settings.get(str(minute), {})
+
+
+def get_sound_file(minute_settings: Optional[MinuteSettingType]) -> str:
+    # 楽曲の一覧を取得する
+    files = glob.glob(f"{SOUND_PATH}/*.wav")
+
+    if minute_settings:
+        target_file = minute_settings.get("sound_file_name")
+        if target_file:
+            for file in files:
+                if target_file in file:
+                    return file
+
+    return random.choice(files)
 
 
 def main() -> None:
@@ -72,9 +88,13 @@ def main() -> None:
     # スケジュールの読み込む
     schedule = load_schedule(SCHEDULE_PATH)
     # スケジュールに基づいて音を鳴らすか判定する
-    if should_run(schedule, now):
+    minute_setting = get_minute_setting(schedule, now)
+
+    if minute_setting is not None:
+        # 楽曲ファイルを取得する
+        sound_file_path = get_sound_file(minute_setting)
         # 曲を再生する
-        play_sound()
+        play_sound(sound_file_path)
 
 
 if __name__ == "__main__":
