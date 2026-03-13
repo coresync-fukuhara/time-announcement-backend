@@ -1,408 +1,114 @@
-[
-  [
-    {
-      "hour": 9,
-      "minutes": [0, 30]
-    },
-    {
-      "hour": 10,
-      "minutes": [0]
-    },
-    {
-      "hour": 11,
-      "minutes": [0]
-    },
-    {
-      "hour": 12,
-      "minutes": [0]
-    },
-    {
-      "hour": 13,
-      "minutes": [0]
-    },
-    {
-      "hour": 14,
-      "minutes": [0]
-    },
-    {
-      "hour": 15,
-      "minutes": [0]
-    },
-    {
-      "hour": 16,
-      "minutes": [0]
-    },
-    {
-      "hour": 17,
-      "minutes": [0, 30]
-    },
-    {
-      "hour": 18,
-      "minutes": [0]
-    },
-    {
-      "hour": 19,
-      "minutes": [0]
-    },
-    {
-      "hour": 20,
-      "minutes": [0]
-    },
-    {
-      "hour": 21,
-      "minutes": [0]
-    },
-    {
-      "hour": 22,
-      "minutes": [0]
-    }
+{
+  "monday": [
+    { "hour": 9, "minutes": [0, 30] },
+    { "hour": 10, "minutes": [0] },
+    { "hour": 11, "minutes": [0] },
+    { "hour": 12, "minutes": [0] },
+    { "hour": 13, "minutes": [0] },
+    { "hour": 14, "minutes": [0] },
+    { "hour": 15, "minutes": [0] },
+    { "hour": 16, "minutes": [0] },
+    { "hour": 17, "minutes": [0, 30] },
+    { "hour": 18, "minutes": [0] },
+    { "hour": 19, "minutes": [0] },
+    { "hour": 20, "minutes": [0] },
+    { "hour": 21, "minutes": [0] },
+    { "hour": 22, "minutes": [0] }
   ],
-  [
-    {
-      "hour": 9,
-      "minutes": [0]
-    },
-    {
-      "hour": 10,
-      "minutes": [0]
-    },
-    {
-      "hour": 11,
-      "minutes": [0]
-    },
-    {
-      "hour": 12,
-      "minutes": [0]
-    },
-    {
-      "hour": 13,
-      "minutes": [0]
-    },
-    {
-      "hour": 14,
-      "minutes": [0]
-    },
-    {
-      "hour": 15,
-      "minutes": [0]
-    },
-    {
-      "hour": 16,
-      "minutes": [0]
-    },
-    {
-      "hour": 17,
-      "minutes": [0]
-    },
-    {
-      "hour": 18,
-      "minutes": [0]
-    },
-    {
-      "hour": 19,
-      "minutes": [0]
-    },
-    {
-      "hour": 20,
-      "minutes": [0]
-    },
-    {
-      "hour": 21,
-      "minutes": [0]
-    },
-    {
-      "hour": 22,
-      "minutes": [0]
-    }
+  "tuesday": [
+    { "hour": 9, "minutes": [0] },
+    { "hour": 10, "minutes": [0] },
+    { "hour": 11, "minutes": [0] },
+    { "hour": 12, "minutes": [0] },
+    { "hour": 13, "minutes": [0] },
+    { "hour": 14, "minutes": [0] },
+    { "hour": 15, "minutes": [0] },
+    { "hour": 16, "minutes": [0] },
+    { "hour": 17, "minutes": [0] },
+    { "hour": 18, "minutes": [0] },
+    { "hour": 19, "minutes": [0] },
+    { "hour": 20, "minutes": [0] },
+    { "hour": 21, "minutes": [0] },
+    { "hour": 22, "minutes": [0] }
   ],
-  [
-    {
-      "hour": 9,
-      "minutes": [0, 30]
-    },
-    {
-      "hour": 10,
-      "minutes": [0]
-    },
-    {
-      "hour": 11,
-      "minutes": [0]
-    },
-    {
-      "hour": 12,
-      "minutes": [0]
-    },
-    {
-      "hour": 13,
-      "minutes": [0]
-    },
-    {
-      "hour": 14,
-      "minutes": [0]
-    },
-    {
-      "hour": 15,
-      "minutes": [0]
-    },
-    {
-      "hour": 16,
-      "minutes": [0]
-    },
-    {
-      "hour": 17,
-      "minutes": [0, 30]
-    },
-    {
-      "hour": 18,
-      "minutes": [0]
-    },
-    {
-      "hour": 19,
-      "minutes": [0]
-    },
-    {
-      "hour": 20,
-      "minutes": [0]
-    },
-    {
-      "hour": 21,
-      "minutes": [0]
-    },
-    {
-      "hour": 22,
-      "minutes": [0]
-    }
+  "wednesday": [
+    { "hour": 9, "minutes": [0, 30] },
+    { "hour": 10, "minutes": [0] },
+    { "hour": 11, "minutes": [0] },
+    { "hour": 12, "minutes": [0] },
+    { "hour": 13, "minutes": [0] },
+    { "hour": 14, "minutes": [0] },
+    { "hour": 15, "minutes": [0] },
+    { "hour": 16, "minutes": [0] },
+    { "hour": 17, "minutes": [0, 30] },
+    { "hour": 18, "minutes": [0] },
+    { "hour": 19, "minutes": [0] },
+    { "hour": 20, "minutes": [0] },
+    { "hour": 21, "minutes": [0] },
+    { "hour": 22, "minutes": [0] }
   ],
-  [
-    {
-      "hour": 9,
-      "minutes": [0, 30]
-    },
-    {
-      "hour": 10,
-      "minutes": [0]
-    },
-    {
-      "hour": 11,
-      "minutes": [0]
-    },
-    {
-      "hour": 12,
-      "minutes": [0]
-    },
-    {
-      "hour": 13,
-      "minutes": [0]
-    },
-    {
-      "hour": 14,
-      "minutes": [0]
-    },
-    {
-      "hour": 15,
-      "minutes": [0]
-    },
-    {
-      "hour": 16,
-      "minutes": [0]
-    },
-    {
-      "hour": 17,
-      "minutes": [0, 30]
-    },
-    {
-      "hour": 18,
-      "minutes": [0]
-    },
-    {
-      "hour": 19,
-      "minutes": [0]
-    },
-    {
-      "hour": 20,
-      "minutes": [0]
-    },
-    {
-      "hour": 21,
-      "minutes": [0]
-    },
-    {
-      "hour": 22,
-      "minutes": [0]
-    }
+  "thursday": [
+    { "hour": 9, "minutes": [0, 30] },
+    { "hour": 10, "minutes": [0] },
+    { "hour": 11, "minutes": [0] },
+    { "hour": 12, "minutes": [0] },
+    { "hour": 13, "minutes": [0] },
+    { "hour": 14, "minutes": [0] },
+    { "hour": 15, "minutes": [0] },
+    { "hour": 16, "minutes": [0] },
+    { "hour": 17, "minutes": [0, 30] },
+    { "hour": 18, "minutes": [0] },
+    { "hour": 19, "minutes": [0] },
+    { "hour": 20, "minutes": [0] },
+    { "hour": 21, "minutes": [0] },
+    { "hour": 22, "minutes": [0] }
   ],
-  [
-    {
-      "hour": 9,
-      "minutes": [0, 30]
-    },
-    {
-      "hour": 10,
-      "minutes": [0]
-    },
-    {
-      "hour": 11,
-      "minutes": [0]
-    },
-    {
-      "hour": 12,
-      "minutes": [0]
-    },
-    {
-      "hour": 13,
-      "minutes": [0]
-    },
-    {
-      "hour": 14,
-      "minutes": [0]
-    },
-    {
-      "hour": 15,
-      "minutes": [0]
-    },
-    {
-      "hour": 16,
-      "minutes": [0]
-    },
-    {
-      "hour": 17,
-      "minutes": [0, 30]
-    },
-    {
-      "hour": 18,
-      "minutes": [0]
-    },
-    {
-      "hour": 19,
-      "minutes": [0]
-    },
-    {
-      "hour": 20,
-      "minutes": [0]
-    },
-    {
-      "hour": 21,
-      "minutes": [0]
-    },
-    {
-      "hour": 22,
-      "minutes": [0]
-    }
+  "friday": [
+    { "hour": 9, "minutes": [0, 30] },
+    { "hour": 10, "minutes": [0] },
+    { "hour": 11, "minutes": [0] },
+    { "hour": 12, "minutes": [0] },
+    { "hour": 13, "minutes": [0] },
+    { "hour": 14, "minutes": [0] },
+    { "hour": 15, "minutes": [0] },
+    { "hour": 16, "minutes": [0] },
+    { "hour": 17, "minutes": [0, 30] },
+    { "hour": 18, "minutes": [0] },
+    { "hour": 19, "minutes": [0] },
+    { "hour": 20, "minutes": [0] },
+    { "hour": 21, "minutes": [0] },
+    { "hour": 22, "minutes": [0] }
   ],
-  [
-    {
-      "hour": 9,
-      "minutes": [0]
-    },
-    {
-      "hour": 10,
-      "minutes": [0]
-    },
-    {
-      "hour": 11,
-      "minutes": [0]
-    },
-    {
-      "hour": 12,
-      "minutes": [0]
-    },
-    {
-      "hour": 13,
-      "minutes": [0]
-    },
-    {
-      "hour": 14,
-      "minutes": [0]
-    },
-    {
-      "hour": 15,
-      "minutes": [0]
-    },
-    {
-      "hour": 16,
-      "minutes": [0]
-    },
-    {
-      "hour": 17,
-      "minutes": [0]
-    },
-    {
-      "hour": 18,
-      "minutes": [0]
-    },
-    {
-      "hour": 19,
-      "minutes": [0]
-    },
-    {
-      "hour": 20,
-      "minutes": [0]
-    },
-    {
-      "hour": 21,
-      "minutes": [0]
-    },
-    {
-      "hour": 22,
-      "minutes": [0]
-    }
+  "saturday": [
+    { "hour": 9, "minutes": [0] },
+    { "hour": 10, "minutes": [0] },
+    { "hour": 11, "minutes": [0] },
+    { "hour": 12, "minutes": [0] },
+    { "hour": 13, "minutes": [0] },
+    { "hour": 14, "minutes": [0] },
+    { "hour": 15, "minutes": [0] },
+    { "hour": 16, "minutes": [0] },
+    { "hour": 17, "minutes": [0] },
+    { "hour": 18, "minutes": [0] },
+    { "hour": 19, "minutes": [0] },
+    { "hour": 20, "minutes": [0] },
+    { "hour": 21, "minutes": [0] },
+    { "hour": 22, "minutes": [0] }
   ],
-  [
-    {
-      "hour": 9,
-      "minutes": [0]
-    },
-    {
-      "hour": 10,
-      "minutes": [0]
-    },
-    {
-      "hour": 11,
-      "minutes": [0]
-    },
-    {
-      "hour": 12,
-      "minutes": [0]
-    },
-    {
-      "hour": 13,
-      "minutes": [0]
-    },
-    {
-      "hour": 14,
-      "minutes": [0]
-    },
-    {
-      "hour": 15,
-      "minutes": [0]
-    },
-    {
-      "hour": 16,
-      "minutes": [0]
-    },
-    {
-      "hour": 17,
-      "minutes": [0]
-    },
-    {
-      "hour": 18,
-      "minutes": [0]
-    },
-    {
-      "hour": 19,
-      "minutes": [0]
-    },
-    {
-      "hour": 20,
-      "minutes": [0]
-    },
-    {
-      "hour": 21,
-      "minutes": [0]
-    },
-    {
-      "hour": 22,
-      "minutes": [0]
-    }
+  "sunday": [
+    { "hour": 9, "minutes": [0] },
+    { "hour": 10, "minutes": [0] },
+    { "hour": 11, "minutes": [0] },
+    { "hour": 12, "minutes": [0] },
+    { "hour": 13, "minutes": [0] },
+    { "hour": 14, "minutes": [0] },
+    { "hour": 15, "minutes": [0] },
+    { "hour": 16, "minutes": [0] },
+    { "hour": 17, "minutes": [0] },
+    { "hour": 18, "minutes": [0] },
+    { "hour": 19, "minutes": [0] },
+    { "hour": 20, "minutes": [0] },
+    { "hour": 21, "minutes": [0] },
+    { "hour": 22, "minutes": [0] }
   ]
-]
+}

@@ -1,53 +1,72 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "weekly_schedule",
-  "description": "各曜日の時間設定",
-  "type": "array",
-  "items": {
-    "type": "array",
-    "title": "hour_settings",
-    "description": "時間毎の設定",
-    "items": {
-      "type": "object",
-      "properties": {
-        "hour": {
-          "type": "number",
-          "title": "hour",
-          "description": "時間 (0-23)"
-        },
-        "minutes": {
-          "type": "array",
-          "title": "minutes",
-          "description": "分 (0-59)",
-          "items": {
-            "type": "number"
-          },
-          "minItems": 0,
-          "maxItems": 60,
-          "uniqueItems": true
-        },
-        "minute_settings": {
-          "type": "object",
-          "title": "minute_settings",
-          "description": "分ごとの詳細設定",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "sound_file_name": {
-                "type": "string",
-                "title": "sound_file_name",
-                "description": "サウンドファイル名"
-              }
-            },
-            "required": ["sound_file_name"]
-          }
-        }
-      },
-      "required": ["hour", "minutes"]
-    },
-    "minItems": 0,
-    "maxItems": 24
+  "description": "各曜日（monday 〜 sunday）の時間設定",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "monday": { "$ref": "#/definitions/daily_schedule" },
+    "tuesday": { "$ref": "#/definitions/daily_schedule" },
+    "wednesday": { "$ref": "#/definitions/daily_schedule" },
+    "thursday": { "$ref": "#/definitions/daily_schedule" },
+    "friday": { "$ref": "#/definitions/daily_schedule" },
+    "saturday": { "$ref": "#/definitions/daily_schedule" },
+    "sunday": { "$ref": "#/definitions/daily_schedule" }
   },
-  "minItems": 7,
-  "maxItems": 7
+  "required": [
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+    "sunday"
+  ],
+  "definitions": {
+    "daily_schedule": {
+      "type": "array",
+      "title": "hour_settings",
+      "description": "時間毎の設定",
+      "items": {
+        "type": "object",
+        "properties": {
+          "hour": {
+            "type": "number",
+            "title": "hour",
+            "description": "時間 (0-23)"
+          },
+          "minutes": {
+            "type": "array",
+            "title": "minutes",
+            "description": "分 (0-59)",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 0,
+            "maxItems": 60,
+            "uniqueItems": true
+          },
+          "minute_settings": {
+            "type": "object",
+            "title": "minute_settings",
+            "description": "分ごとの詳細設定",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "sound_file_name": {
+                  "type": "string",
+                  "title": "sound_file_name",
+                  "description": "サウンドファイル名"
+                }
+              },
+              "required": ["sound_file_name"]
+            }
+          }
+        },
+        "required": ["hour"]
+      },
+      "minItems": 0,
+      "maxItems": 24
+    }
+  }
 }

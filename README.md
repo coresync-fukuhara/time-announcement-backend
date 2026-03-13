@@ -1,7 +1,7 @@
 
 # タイムアナウンスメント
 
-`src/main.py` は、曜日×時間のスケジュール（[settings/schedules.json](settings/schedules.json)）に従って、正時（分=0）に `sounds/` 配下の `.wav` をランダムに1曲再生します。
+`src/main.py` は、曜日×時間のスケジュール（[settings/schedules.json](settings/schedules.json)）に従って、指定されたタイミングで `sounds/` 配下の `.wav` を再生します。
 
 ## 前提
 
@@ -30,41 +30,73 @@ Linux で `sounddevice` のロードに失敗する場合は、PortAudio 系の�
 ### スケジュール
 
 - 設定ファイル: [settings/schedules.json](settings/schedules.json)
-- 形式: 「7要素（曜日）」×「各曜日は時間設定の配列」
-- 曜日インデックスは Python の `datetime.weekday()` と同じです。
-	- `0=月, 1=火, ..., 5=土, 6=日`
+- 形式: **曜日キー（`monday` 〜 `sunday`）** を持つオブジェクト
 
-各時間設定は `{ "hour": 0-23, "minutes": [0-59,...] }` のオブジェクトです。
-`minutes` は必須で、最低1つ以上の分を指定します（正時のみでよければ `[0]` のように 0 のみを指定します）。
-スキーマは [settings/schema.json](settings/schema.json) にあります。
-
-例1（毎日 9時と18時の **0分のみ** 鳴らす）:
+各時間設定（各曜日の配列要素）は基本的に次のようなオブジェクトです。
 
 ```json
-[
-	[{"hour": 9, "minutes": [0]}, {"hour": 18, "minutes": [0]}],
-	[{"hour": 9, "minutes": [0]}, {"hour": 18, "minutes": [0]}],
-	[{"hour": 9, "minutes": [0]}, {"hour": 18, "minutes": [0]}],
-	[{"hour": 9, "minutes": [0]}, {"hour": 18, "minutes": [0]}],
-	[{"hour": 9, "minutes": [0]}, {"hour": 18, "minutes": [0]}],
-	[{"hour": 9, "minutes": [0]}, {"hour": 18, "minutes": [0]}],
-	[{"hour": 9, "minutes": [0]}, {"hour": 18, "minutes": [0]}]
-]
+{ "hour": 0-23, "minutes": [0-59, ...] }
 ```
 
-例2（毎日 9時と17時の **0分と30分** に鳴らす）:
+- **`minutes`**: その時間帯で鳴らす分のリストです。
+  - 例: `{"hour": 9, "minutes": [0, 30]}` → 9:00 と 9:30 に鳴る
+  - 例: `{"hour": 17, "minutes": [0]}` → 17:00 のみ鳴る
+- **省略時の挙動**: `minutes` を省略した場合は「**0分のみ**」有効として扱われます（実装側でそう解釈します）。
+
+さらに、分ごとに詳細設定を付けたい場合は、任意で `minute_settings` を追加できます。
 
 ```json
-[
-	[{"hour": 9, "minutes": [0, 30]}, {"hour": 17, "minutes": [0, 30]}],
-	[{"hour": 9, "minutes": [0, 30]}, {"hour": 17, "minutes": [0, 30]}],
-	[{"hour": 9, "minutes": [0, 30]}, {"hour": 17, "minutes": [0, 30]}],
-	[{"hour": 9, "minutes": [0, 30]}, {"hour": 17, "minutes": [0, 30]}],
-	[{"hour": 9, "minutes": [0, 30]}, {"hour": 17, "minutes": [0, 30]}],
-	[{"hour": 9, "minutes": [0, 30]}, {"hour": 17, "minutes": [0, 30]}],
-	[{"hour": 9, "minutes": [0, 30]}, {"hour": 17, "minutes": [0, 30]}]
-]
+{
+  "hour": 9,
+  "minutes": [0, 30],
+  "minute_settings": {
+    "0": {
+      "sound_file_name": "morning.wav"
+    },
+    "30": {
+      "sound_file_name": "break.wav"
+    }
+  }
+}
 ```
+
+- **`minute_settings`**: キーは「分」を文字列化したもの（例: `"0"`, `"30"`）です。
+- **`sound_file_name`**: 使用したい `.wav` ファイル名（一致する部分文字列）です。
+  - 実際には `sounds/user/` と `sounds/default/` を走査し、パスの中にこの文字列を含むファイルを探します。
+  - 見つかった場合はそのファイルを優先的に再生します。
+  - 見つからない、または `minute_settings` 自体がない場合は、候補リストからランダムに1つ選んで再生します。
+
+スキーマ定義は [settings/schema.json](settings/schema.json) を参照してください。
+
+#### 例1（毎日 9時と18時の **0分のみ** 鳴らす）
+
+```json
+{
+  "monday": [{ "hour": 9, "minutes": [0] }, { "hour": 18, "minutes": [0] }],
+  "tuesday": [{ "hour": 9, "minutes": [0] }, { "hour": 18, "minutes": [0] }],
+  "wednesday": [{ "hour": 9, "minutes": [0] }, { "hour": 18, "minutes": [0] }],
+  "thursday": [{ "hour": 9, "minutes": [0] }, { "hour": 18, "minutes": [0] }],
+  "friday": [{ "hour": 9, "minutes": [0] }, { "hour": 18, "minutes": [0] }],
+  "saturday": [{ "hour": 9, "minutes": [0] }, { "hour": 18, "minutes": [0] }],
+  "sunday": [{ "hour": 9, "minutes": [0] }, { "hour": 18, "minutes": [0] }]
+}
+```
+
+#### 例2（毎日 9時と17時の **0分と30分** に鳴らす）
+
+```json
+{
+  "monday": [{ "hour": 9, "minutes": [0, 30] }, { "hour": 17, "minutes": [0, 30] }],
+  "tuesday": [{ "hour": 9, "minutes": [0, 30] }, { "hour": 17, "minutes": [0, 30] }],
+  "wednesday": [{ "hour": 9, "minutes": [0, 30] }, { "hour": 17, "minutes": [0, 30] }],
+  "thursday": [{ "hour": 9, "minutes": [0, 30] }, { "hour": 17, "minutes": [0, 30] }],
+  "friday": [{ "hour": 9, "minutes": [0, 30] }, { "hour": 17, "minutes": [0, 30] }],
+  "saturday": [{ "hour": 9, "minutes": [0, 30] }, { "hour": 17, "minutes": [0, 30] }],
+  "sunday": [{ "hour": 9, "minutes": [0, 30] }, { "hour": 17, "minutes": [0, 30] }]
+}
+```
+
+※ 現在の実装は **曜日キー形式のみ** を前提にしています（`monday`〜`sunday` のキーが必要です）。
 
 ## 実行方法
 

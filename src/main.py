@@ -58,10 +58,11 @@ def load_schedule(path: str) -> WeeklyScheduleType:
 def get_minute_setting(
     schedule: WeeklyScheduleType, now: datetime.datetime
 ) -> Optional[MinuteSettingType]:
-    # 曜日を取得する (0=月曜, 6=日曜)
-    weekday = now.weekday() % 7
+    # 曜日のキー名を取得する（monday, tuesday, ...）
+    weekday_index = now.strftime("%A").lower()
+
     # 今日のスケジュールを取得する
-    today_schedule = schedule[weekday]
+    today_schedule = schedule.get(weekday_index, [])
     # 現在の時刻を取得する
     hour = now.hour
     minute = now.minute
@@ -73,14 +74,19 @@ def get_minute_setting(
     if hour_settings is None:
         return None
 
-    # 分の設定を取得する
-    minites_list = hour_settings["minutes"]
+    # 分の設定を取得する（省略時は 0 分のみとみなす）
+    minutes_list = hour_settings.get("minutes")
 
-    # 分の設定に現在の分が含まれていない場合は実行しない
-    if minute not in minites_list:
-        return None
+    if minutes_list:
+        # 分の設定に現在の分が含まれていない場合は実行しない
+        if minute not in minutes_list:
+            return None
+    else:
+        # minutes が指定されていない場合は 0 分のみ有効
+        if minute != 0:
+            return None
 
-    minute_settings = hour_settings.get("minute_settings", {})
+    minute_settings = hour_settings.get("minute_settings") or {}
 
     return minute_settings.get(str(minute), {})
 

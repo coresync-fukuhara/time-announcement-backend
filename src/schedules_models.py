@@ -12,4 +12,13 @@ class HourlyScheduleItemType(TypedDict):
 
 
 DailyScheduleType = List[HourlyScheduleItemType]
-WeeklyScheduleType = List[DailyScheduleType]
+
+
+class WeeklyScheduleType(TypedDict):
+    monday: DailyScheduleType
+    tuesday: DailyScheduleType
+    wednesday: DailyScheduleType
+    thursday: DailyScheduleType
+    friday: DailyScheduleType
+    saturday: DailyScheduleType
+    sunday: DailyScheduleType
