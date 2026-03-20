@@ -13,7 +13,7 @@
 依存パッケージをインストールします。
 
 ```bash
-pip install -r requirements.txt
+uv sync
 ```
 
 Linux で `sounddevice` のロードに失敗する場合は、PortAudio 系のパッケージが不足している可能性があります（環境によりパッケージ名が異なります）。
@@ -102,11 +102,10 @@ Linux で `sounddevice` のロードに失敗する場合は、PortAudio 系の�
 
 ## 実行方法
 
-`src/main.py` は `from schedules_models import ...` の形で import しているため、`src/` をカレントディレクトリにして実行するのが簡単です。
+`src/main.py` は `from schedules_models import ...` の形で import しているため、プロジェクトルートから次のコマンドで実行できます。
 
 ```bash
-cd src
-python main.py
+uv run python src/main.py
 ```
 
 ### 実行条件（鳴るタイミング）

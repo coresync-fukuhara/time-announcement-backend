@@ -1,0 +1,22 @@
+[project]
+name = "time-announcement-backend"
+version = "0.1.0"
+description = "Time announcement backend"
+requires-python = ">=3.10"
+dependencies = [
+    "scipy",
+    "sounddevice",
+    "jpholiday",
+    "datamodel-code-generator",
+]
+
+[dependency-groups]
+dev = [
+    "ruff",
+]
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+ignore = ["E203"]

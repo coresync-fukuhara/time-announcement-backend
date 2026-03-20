@@ -1,7 +1,0 @@
-scipy
-sounddevice
-jpholiday
-black
-isort
-flake8
-datamodel-code-generator
