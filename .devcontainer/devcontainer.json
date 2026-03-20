@@ -6,7 +6,7 @@
     "runServices": [
         "app"
     ],
-    "postCreateCommand": "uv sync",
+    "postCreateCommand": "uv sync && git config --global --add safe.directory /app",
     "customizations": {
         "vscode": {
             "extensions": [
@@ -14,13 +14,16 @@
                 "ms-python.vscode-pylance",
                 "charliermarsh.ruff",
                 "ms-python.mypy-type-checker",
-                "ms-azuretools.vscode-docker"
+                "ms-azuretools.vscode-docker",
+                "oderwat.indent-rainbow",
+                "ms-ceintl.vscode-language-pack-ja"
             ]
         },
         "settings": {
             "editor.formatOnSave": true,
             "[python]": {
-                "editor.defaultFormatter": "charliermarsh.ruff"
+                "editor.defaultFormatter": "charliermarsh.ruff",
+                "python.defaultInterpreterPath": "/app/.venv/bin/python3"
             },
             "editor.codeActionsOnSave": {
                 "source.fixAll.ruff": "explicit",
