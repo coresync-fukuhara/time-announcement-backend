@@ -110,5 +110,6 @@
     { "hour": 20, "minutes": [0] },
     { "hour": 21, "minutes": [0] },
     { "hour": 22, "minutes": [0] }
-  ]
+  ],
+  "holiday": []
 }

@@ -6,9 +6,11 @@ import random
 from typing import Optional
 from zoneinfo import ZoneInfo
 
+import jpholiday
+
 from scipy.io import wavfile
 import sounddevice as sd
-from schedules_models import MinuteSettingType, WeeklyScheduleType
+from schedules_models import MinuteSettings, WeeklySchedule
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -42,12 +44,12 @@ def play_sound(sound_file_path: str) -> None:
     sd.wait()
 
 
-def load_schedule(path: str) -> WeeklyScheduleType:
+def load_schedule(path: str) -> WeeklySchedule:
     # スケジュールを読み込む
     with open(path, encoding="utf-8") as f:
         try:
             data = json.load(f)
-            schedules: WeeklyScheduleType = data
+            schedules: WeeklySchedule = data
 
         except json.JSONDecodeError:
             return {}
@@ -55,43 +57,53 @@ def load_schedule(path: str) -> WeeklyScheduleType:
         return schedules
 
 
-def get_minute_setting(
-    schedule: WeeklyScheduleType, now: datetime.datetime
-) -> Optional[MinuteSettingType]:
-    # 曜日のキー名を取得する（monday, tuesday, ...）
-    weekday_index = now.strftime("%A").lower()
+def _find_hour_settings(daily_schedule: list[dict], hour: int) -> Optional[dict]:
+    return next((s for s in daily_schedule if s.get("hour") == hour), None)
 
-    # 今日のスケジュールを取得する
-    today_schedule = schedule.get(weekday_index, [])
+
+def _is_japanese_holiday(date: datetime.date) -> bool:
+    if jpholiday is None:
+        return False
+    return jpholiday.is_holiday(date)
+
+
+def get_minute_setting(
+    schedule: WeeklySchedule, now: datetime.datetime
+) -> Optional[MinuteSettings]:
+    today_schedule = []
+
+    # 祝日は holiday を優先、なければ sunday を使う
+    is_holiday = _is_japanese_holiday(now.date())
+    print(f"Is today a holiday? {is_holiday}")
+    if is_holiday:
+        today_schedule = schedule.get("holiday", [])
+
+    if today_schedule == []:
+        weekday_index = now.strftime("%A").lower()
+        today_schedule = schedule.get(weekday_index, [])
+
+    print(today_schedule)
     # 現在の時刻を取得する
     hour = now.hour
     minute = now.minute
 
     # 現在の時刻に対応する設定を取得する
-    hour_settings = next((s for s in today_schedule if s["hour"] == hour), None)
-
-    # 設定が存在しない場合は実行しない
+    hour_settings = _find_hour_settings(today_schedule, hour)
     if hour_settings is None:
         return None
 
-    # 分の設定を取得する（省略時は 0 分のみとみなす）
+    # 分の設定を取得する
     minutes_list = hour_settings.get("minutes")
 
     if minutes_list:
-        # 分の設定に現在の分が含まれていない場合は実行しない
         if minute not in minutes_list:
-            return None
-    else:
-        # minutes が指定されていない場合は 0 分のみ有効
-        if minute != 0:
             return None
 
     minute_settings = hour_settings.get("minute_settings") or {}
-
     return minute_settings.get(str(minute), {})
 
 
-def get_sound_file(minute_settings: Optional[MinuteSettingType]) -> str:
+def get_sound_file(minute_settings: Optional[MinuteSettings]) -> str:
     # 楽曲の一覧を取得する
     files = _collect_sound_files()
 

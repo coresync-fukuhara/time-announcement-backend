@@ -5,6 +5,7 @@
   "type": "object",
   "additionalProperties": false,
   "properties": {
+    "holiday": { "$ref": "#/definitions/daily_schedule" },
     "monday": { "$ref": "#/definitions/daily_schedule" },
     "tuesday": { "$ref": "#/definitions/daily_schedule" },
     "wednesday": { "$ref": "#/definitions/daily_schedule" },
