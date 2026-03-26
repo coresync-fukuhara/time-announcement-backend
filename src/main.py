@@ -1,51 +1,130 @@
 import datetime
-import glob
 import json
 import os
 import random
-from typing import Optional
+from collections.abc import Sequence
+from typing import Any, Optional
 from zoneinfo import ZoneInfo
 
 import jpholiday
-
 from scipy.io import wavfile
 import sounddevice as sd
-from schedules_models import MinuteSettings, WeeklySchedule
 
+from music_db import (
+    create_session_factory,
+    create_sqlite_engine,
+    get_random_track_by_type,
+    get_track_by_name,
+)
+from schedules_models import AudioType, MinuteSettings, WeeklySchedule
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCHEDULE_PATH = os.path.join(BASE_DIR, "settings/schedules.json")
-SOUND_BASE_PATH = os.path.join(BASE_DIR, "sounds")
-USER_SOUND_PATH = os.path.join(SOUND_BASE_PATH, "user")
-DEFAULT_SOUND_PATH = os.path.join(SOUND_BASE_PATH, "default")
+DB_PATH = os.path.join(BASE_DIR, "db", "music.sqlite3")
+
+_DB_SESSION_FACTORY = None
 
 
-def _collect_sound_files() -> list[str]:
-    # ユーザーが追加した楽曲（sounds/user/*.wav）を優先する
-    user_files = glob.glob(os.path.join(USER_SOUND_PATH, "*.wav"))
-    if user_files:
-        return user_files
+def _get_db_session_factory():
+    global _DB_SESSION_FACTORY
 
-    # ユーザー楽曲がなければ、同梱のデフォルト楽曲（sounds/default/*.wav）を使う
-    default_files = glob.glob(os.path.join(DEFAULT_SOUND_PATH, "*.wav"))
-    if default_files:
-        return default_files
+    if _DB_SESSION_FACTORY is not None:
+        return _DB_SESSION_FACTORY
 
-    # 音源が1つもない場合は空リストを返す
-    return []
+    if not os.path.exists(DB_PATH):
+        return None
+
+    engine = create_sqlite_engine(DB_PATH)
+    _DB_SESSION_FACTORY = create_session_factory(engine)
+    return _DB_SESSION_FACTORY
+
+
+def _normalize_track_name(track_name: str) -> str:
+    normalized = track_name.strip()
+    if normalized.lower().endswith(".wav"):
+        normalized = normalized[:-4]
+    return normalized
+
+
+def _extract_sound_file_name(
+    minute_settings: MinuteSettings | dict[str, Any],
+) -> Optional[str]:
+    if isinstance(minute_settings, dict):
+        value = minute_settings.get("sound_file_name")
+    else:
+        value = minute_settings.sound_file_name
+
+    if value is None:
+        return None
+
+    text = str(value).strip()
+    return text or None
+
+
+def _extract_sound_types(minute_settings: MinuteSettings | dict[str, Any]) -> list[str]:
+    if isinstance(minute_settings, dict):
+        raw_types = minute_settings.get("sound_types")
+    else:
+        raw_types = minute_settings.sound_types
+
+    if raw_types is None:
+        return []
+
+    type_names: list[str] = []
+    for item in raw_types:
+        if isinstance(item, AudioType):
+            type_names.append(item.value)
+            continue
+
+        text = str(item).strip()
+        if not text:
+            continue
+
+        try:
+            type_names.append(AudioType(text).value)
+        except ValueError:
+            continue
+
+    return list(dict.fromkeys(type_names))
+
+
+def _resolve_track_path_by_name(track_name: str) -> Optional[str]:
+    session_factory = _get_db_session_factory()
+    if session_factory is None:
+        return None
+
+    with session_factory() as session:
+        track = get_track_by_name(session, _normalize_track_name(track_name))
+        if track is not None and os.path.exists(track.file_path):
+            return track.file_path
+
+    return None
+
+
+def _resolve_track_path_by_types(type_names: Sequence[str]) -> Optional[str]:
+    session_factory = _get_db_session_factory()
+    if session_factory is None:
+        return None
+
+    shuffled_types = list(type_names)
+    random.shuffle(shuffled_types)
+
+    with session_factory() as session:
+        for type_name in shuffled_types:
+            track = get_random_track_by_type(session, type_name)
+            if track is not None and os.path.exists(track.file_path):
+                return track.file_path
+
+    return None
 
 
 def play_sound(sound_file_path: str) -> None:
-    # 音声ファイルを読み込む
     fs, data = wavfile.read(sound_file_path)
-
-    # 音声を再生する
     sd.play(data, fs)
     sd.wait()
 
 
 def load_schedule(path: str) -> WeeklySchedule:
-    # スケジュールを読み込む
     with open(path, encoding="utf-8") as f:
         try:
             data = json.load(f)
@@ -72,7 +151,6 @@ def get_minute_setting(
 ) -> Optional[MinuteSettings]:
     today_schedule = []
 
-    # 祝日は holiday を優先、なければ sunday を使う
     is_holiday = _is_japanese_holiday(now.date())
     print(f"Is today a holiday? {is_holiday}")
     if is_holiday:
@@ -83,51 +161,58 @@ def get_minute_setting(
         today_schedule = schedule.get(weekday_index, [])
 
     print(today_schedule)
-    # 現在の時刻を取得する
     hour = now.hour
     minute = now.minute
 
-    # 現在の時刻に対応する設定を取得する
     hour_settings = _find_hour_settings(today_schedule, hour)
     if hour_settings is None:
         return None
 
-    # 分の設定を取得する
     minutes_list = hour_settings.get("minutes")
-
-    if minutes_list:
-        if minute not in minutes_list:
-            return None
+    if minutes_list and minute not in minutes_list:
+        return None
 
     minute_settings = hour_settings.get("minute_settings") or {}
-    return minute_settings.get(str(minute), {})
+    result = minute_settings.get(str(minute))
+    if result is None:
+        return None
+    return result
 
 
 def get_sound_file(minute_settings: Optional[MinuteSettings]) -> str:
-    # 楽曲の一覧を取得する
-    files = _collect_sound_files()
+    if minute_settings is None:
+        raise ValueError("minute_settings が指定されていません")
 
-    if minute_settings:
-        target_file = minute_settings.sound_file_name
-        for file in files:
-            if target_file in file:
-                return file
+    sound_file_name = _extract_sound_file_name(minute_settings)
 
-    return random.choice(files)
+    # 曲名指定がある場合は最優先。タイプ指定は無視する。
+    if sound_file_name:
+        resolved_by_name = _resolve_track_path_by_name(sound_file_name)
+        if resolved_by_name:
+            return resolved_by_name
+        raise FileNotFoundError(
+            f"指定された楽曲がDBに見つかりません: {_normalize_track_name(sound_file_name)}"
+        )
+
+    # タイプ未指定なら ALARM をデフォルト扱い
+    sound_types = _extract_sound_types(minute_settings) or [AudioType.ALARM.value]
+
+    resolved_by_type = _resolve_track_path_by_types(sound_types)
+    if resolved_by_type:
+        return resolved_by_type
+
+    raise FileNotFoundError(
+        f"指定タイプに一致する楽曲がDBに見つかりません: {', '.join(sound_types)}"
+    )
 
 
 def main() -> None:
-    # 現在時刻を取得する
     now = datetime.datetime.now(ZoneInfo("Asia/Tokyo"))
-    # スケジュールの読み込む
     schedule = load_schedule(SCHEDULE_PATH)
-    # スケジュールに基づいて音を鳴らすか判定する
     minute_setting = get_minute_setting(schedule, now)
 
     if minute_setting is not None:
-        # 楽曲ファイルを取得する
         sound_file_path = get_sound_file(minute_setting)
-        # 曲を再生する
         play_sound(sound_file_path)
 
 
