@@ -24,6 +24,12 @@
     "sunday"
   ],
   "definitions": {
+    "audio_type": {
+      "type": "string",
+      "title": "audio_type",
+      "description": "音声タイプ",
+      "enum": ["DEFAULT", "NOTIFICATION", "ALARM"]
+    },
     "daily_schedule": {
       "type": "array",
       "title": "hour_settings",
@@ -58,6 +64,16 @@
                   "type": "string",
                   "title": "sound_file_name",
                   "description": "サウンドファイル名"
+                },
+                "sound_types": {
+                  "type": "array",
+                  "title": "sound_types",
+                  "description": "再生対象の音声タイプ一覧",
+                  "items": {
+                    "$ref": "#/definitions/audio_type"
+                  },
+                  "minItems": 1,
+                  "uniqueItems": true
                 }
               },
               "required": ["sound_file_name"]
