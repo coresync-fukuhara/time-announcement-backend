@@ -1,3 +1,3 @@
 #!/bin/bash
 
-uv run datamodel-codegen --input settings/schema.json --output src/schedules_models.py --input-file-type jsonschema
+uv run datamodel-codegen --input settings/schema.json --output src/schedules_models.py --input-file-type jsonschema --output-model-type pydantic_v2.BaseModel

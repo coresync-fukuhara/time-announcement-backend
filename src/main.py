@@ -108,11 +108,10 @@ def get_sound_file(minute_settings: Optional[MinuteSettings]) -> str:
     files = _collect_sound_files()
 
     if minute_settings:
-        target_file = minute_settings.get("sound_file_name")
-        if target_file:
-            for file in files:
-                if target_file in file:
-                    return file
+        target_file = minute_settings.sound_file_name
+        for file in files:
+            if target_file in file:
+                return file
 
     return random.choice(files)
 
