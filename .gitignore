@@ -81,6 +81,3 @@ cython_debug/
 
 # Ruff
 .ruff_cache/
-
-# User sounds
-sounds/user/*.wav
