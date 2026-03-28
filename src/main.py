@@ -175,7 +175,7 @@ def get_minute_setting(
     minute_settings = hour_settings.get("minute_settings") or {}
     result = minute_settings.get(str(minute))
     if result is None:
-        return None
+        return {}
     return result
 
 
