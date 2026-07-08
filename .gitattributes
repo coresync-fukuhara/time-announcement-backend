@@ -1,0 +1,16 @@
+# 改行コードを LF に固定する（WSL/Linux での CRLF 混入を防止）
+* text=auto eol=lf
+
+# テキストファイルは明示的に LF
+*.py    text eol=lf
+*.json  text eol=lf
+*.yaml  text eol=lf
+*.toml  text eol=lf
+*.md    text eol=lf
+*.lock  text eol=lf
+*.ini   text eol=lf
+*.editorconfig text eol=lf
+Dockerfile text eol=lf
+
+# バイナリファイルは変換しない
+*.wav   binary
