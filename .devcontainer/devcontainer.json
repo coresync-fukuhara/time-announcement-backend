@@ -1,12 +1,21 @@
 {
     "name": "time-announcement-backend",
-    "dockerComposeFile": "./docker-compose.yaml",
-    "service": "app",
+    "image": "mcr.microsoft.com/devcontainers/base:bookworm",
     "workspaceFolder": "/app",
-    "runServices": [
-        "app"
+    "workspaceMount": "source=${localWorkspaceFolder},target=/app,type=bind,consistency=cached",
+    "mounts": [
+        "source=/mnt/wslg,target=/mnt/wslg,type=bind"
     ],
-    "postCreateCommand": "uv sync && git config --global --add safe.directory /app",
+    "containerEnv": {
+        "PULSE_SERVER": "/mnt/wslg/PulseServer"
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/python:1": {
+            "version": "3.13"
+        },
+        "ghcr.io/devcontainers/features/github-cli:1": {}
+    },
+    "postCreateCommand": "bash .devcontainer/post-create.sh",
     "customizations": {
         "vscode": {
             "extensions": [
