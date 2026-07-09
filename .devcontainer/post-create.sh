@@ -23,10 +23,16 @@ configure_git() {
     git config --global --add safe.directory /app
 }
 
+# .claude の所有者を変更する (root でマウントされるため)
+claude_ownership() {
+    sudo chown -R vscode:vscode ~/.claude
+}
+
 main() {
     install_system_packages
     setup_python
     configure_git
+    claude_ownership
 }
 
 main "$@"

@@ -4,7 +4,8 @@
     "workspaceFolder": "/app",
     "workspaceMount": "source=${localWorkspaceFolder},target=/app,type=bind,consistency=cached",
     "mounts": [
-        "source=/mnt/wslg,target=/mnt/wslg,type=bind"
+        "source=/mnt/wslg,target=/mnt/wslg,type=bind",
+        "source=claude-code-config,target=/home/vscode/.claude,type=volume"
     ],
     "containerEnv": {
         "PULSE_SERVER": "/mnt/wslg/PulseServer"
@@ -13,7 +14,9 @@
         "ghcr.io/devcontainers/features/python:1": {
             "version": "3.13"
         },
-        "ghcr.io/devcontainers/features/github-cli:1": {}
+        "ghcr.io/devcontainers/features/github-cli:1": {},
+        "ghcr.io/devcontainers/features/node:2.1.0": {},
+        "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
     },
     "postCreateCommand": "bash .devcontainer/post-create.sh",
     "customizations": {
