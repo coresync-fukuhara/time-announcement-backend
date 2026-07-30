@@ -1,0 +1,31 @@
+name: time-announcement-backend
+version: 1.0.0
+description: タイムアナウンスメント再生プログラム(src/main.py)向け Python バックエンド
+author: macha434
+targets:
+- claude
+dependencies:
+  apm:
+  - anthropics/claude-plugins-official/plugins/claude-md-management
+  - anthropics/claude-plugins-official/plugins/feature-dev
+  - anthropics/claude-plugins-official/plugins/pr-review-toolkit
+  - anthropics/claude-plugins-official/plugins/commit-commands
+  - anthropics/claude-plugins-official/plugins/hookify
+  - anthropics/claude-plugins-official/plugins/security-guidance
+  - obra/superpowers
+  - anthropics/claude-plugins-official/plugins/claude-security
+  - anthropics/claude-plugins-official/plugins/claude-code-setup
+  mcp:
+  - name: github
+    registry: false
+    transport: http
+    url: https://api.githubcopilot.com/mcp/
+  - name: context7
+    registry: false
+    transport: stdio
+    command: npx
+    args:
+      - -y
+      - '@upstash/context7-mcp'
+includes: auto
+scripts: {}

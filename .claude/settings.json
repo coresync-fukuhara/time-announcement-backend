@@ -1,0 +1,161 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \".claude/hooks/hookify/hooks/pretooluse.py\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \".claude/hooks/hookify/hooks/posttooluse.py\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \".claude/hooks/security-guidance/hooks/sg-python.sh\" \".claude/hooks/security-guidance/hooks/security_reminder_hook.py\""
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Bash(git commit:*)",
+            "asyncRewake": true,
+            "rewakeMessage": "Background security review of commit \u2014 address or acknowledge the findings below, then continue with the user's original request or continue waiting for their reply:",
+            "rewakeSummary": "Commit security review found issues",
+            "command": "bash \".claude/hooks/security-guidance/hooks/sg-python.sh\" \".claude/hooks/security-guidance/hooks/security_reminder_hook.py\""
+          },
+          {
+            "type": "command",
+            "if": "Bash(git push:*)",
+            "asyncRewake": true,
+            "rewakeMessage": "Background security review of pushed commits not yet reviewed \u2014 address or acknowledge the findings below, then continue with the user's original request or continue waiting for their reply:",
+            "rewakeSummary": "Push security review found issues",
+            "command": "bash \".claude/hooks/security-guidance/hooks/sg-python.sh\" \".claude/hooks/security-guidance/hooks/security_reminder_hook.py\""
+          },
+          {
+            "type": "command",
+            "if": "Bash(gt create:*)",
+            "asyncRewake": true,
+            "rewakeMessage": "Background security review of commit \u2014 address or acknowledge the findings below, then continue with the user's original request or continue waiting for their reply:",
+            "rewakeSummary": "Commit security review found issues",
+            "command": "bash \".claude/hooks/security-guidance/hooks/sg-python.sh\" \".claude/hooks/security-guidance/hooks/security_reminder_hook.py\""
+          },
+          {
+            "type": "command",
+            "if": "Bash(gt modify:*)",
+            "asyncRewake": true,
+            "rewakeMessage": "Background security review of commit \u2014 address or acknowledge the findings below, then continue with the user's original request or continue waiting for their reply:",
+            "rewakeSummary": "Commit security review found issues",
+            "command": "bash \".claude/hooks/security-guidance/hooks/sg-python.sh\" \".claude/hooks/security-guidance/hooks/security_reminder_hook.py\""
+          },
+          {
+            "type": "command",
+            "if": "Bash(gt submit:*)",
+            "asyncRewake": true,
+            "rewakeMessage": "Background security review of pushed commits not yet reviewed \u2014 address or acknowledge the findings below, then continue with the user's original request or continue waiting for their reply:",
+            "rewakeSummary": "Push security review found issues",
+            "command": "bash \".claude/hooks/security-guidance/hooks/sg-python.sh\" \".claude/hooks/security-guidance/hooks/security_reminder_hook.py\""
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \".claude/hooks/hookify/hooks/stop.py\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "asyncRewake": true,
+            "rewakeMessage": "Background security review feedback \u2014 address or acknowledge the findings below, then continue with the user's original request or continue waiting for their reply. This is supplementary, not a replacement for your previous response:",
+            "rewakeSummary": "Background security review found issues",
+            "command": "bash \".claude/hooks/security-guidance/hooks/sg-python.sh\" \".claude/hooks/security-guidance/hooks/security_reminder_hook.py\""
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \".claude/hooks/hookify/hooks/userpromptsubmit.py\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \".claude/hooks/security-guidance/hooks/sg-python.sh\" \".claude/hooks/security-guidance/hooks/security_reminder_hook.py\""
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \".claude/hooks/security-guidance/hooks/sg-python.sh\" \".claude/hooks/security-guidance/hooks/ensure_agent_sdk.py\"",
+            "timeout": 180
+          }
+        ]
+      },
+      {
+        "matcher": "startup|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "bash",
+            "async": false,
+            "command": "\".claude/hooks/superpowers/hooks/run-hook.cmd\" session-start"
+          }
+        ]
+      }
+    ],
+    "UserPromptExpansion": [
+      {
+        "matcher": "^claude-security:claude-security$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \".claude/hooks/claude-security/hooks/banner_hook.sh\""
+          }
+        ]
+      }
+    ]
+  }
+}

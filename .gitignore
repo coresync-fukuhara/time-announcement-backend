@@ -81,3 +81,7 @@ cython_debug/
 
 # Ruff
 .ruff_cache/
+
+
+# APM dependencies
+apm_modules/
