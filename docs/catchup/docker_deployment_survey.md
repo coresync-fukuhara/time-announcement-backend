@@ -17,8 +17,8 @@
 | スケジューリング方式（3.1） | **D. supercronic**（コンテナ内蔵） | 要件「`docker compose up` 一発でデプロイ完結」を満たすのは D/E のみ（A/B/C はホスト側 cron/systemd の別設定が必要なため除外）。D と E を比べると、E は `docker-compose.yml` に ofelia サービスを追加し `/var/run/docker.sock` を渡す必要がある（実質 root 相当の権限）一方、本システムはスケジュールするジョブが1つだけで ofelia の疎結合という強みがほぼ活きない。実装コスト・セキュリティ面ともに D が優位と判断した | 2026-07-30 |
 | デプロイ先ホスト環境 | **Ubuntu**（素の Linux。WSL2 ではない） | 本番ホストとして確定。ただし「他プロセスも音を鳴らす可能性がある」という制約があるため、3.2 の音声方式選定に直結する | 2026-07-30 |
 | 音声出力方式（3.2） | **PulseAudio ソケット共有**（ホストの PulseAudio／PipeWire-pulse ソケットを bind mount） | ALSA デバイス直渡しは単一プロセス専有が前提で、他プロセスと同時に音を鳴らすと競合する。今回は「他プロセスも音を鳴らす可能性がある」ため不適合。PulseAudio ソケット共有は複数プロセスの同時再生に対応でき、devcontainer（WSLg 経由）で実績もある方式のため採用。**要確認**: 対象 Ubuntu ホストが素の PulseAudio か PipeWire-pulse かで bind mount するソケットパスが変わる（実装時に `pactl info` 等でホストを確認する） | 2026-07-30 |
-| 永続化データの方式（3.3） | **全て named volume 化**（`db/music.sqlite3`、`settings/schedules.json`、`sounds/user/`） | 別リポジトリの**フロントエンド（スケジュール編集・楽曲追加UI）が同じボリュームをマウントして書き込む**運用のため、単純な bind mount（ホスト直編集前提）ではなく、複数コンテナ間の共有ストレージに適した named volume を採用。`sounds/default/*.wav` はリポジトリ同梱で実行時に変化しないため volume 化せず `COPY` で焼き込む | 2026-07-30 |
-| Volume名（3.3） | `time-announcement-db` / `time-announcement-settings` / `time-announcement-sounds-user`（`external: true`） | 本リポジトリ側で固定名を先に決め、フロントエンド側がそれに合わせる運用で合意 | 2026-07-30 |
+| 永続化データの方式（3.3） | **全て named volume 化**（`db/music.sqlite3`、`settings/schedules.json`、`sounds/`） | 別リポジトリの**フロントエンド（スケジュール編集・楽曲追加UI）が同じボリュームをマウントして書き込む**運用のため、単純な bind mount（ホスト直編集前提）ではなく、複数コンテナ間の共有ストレージに適した named volume を採用。`sounds/default/*.wav` はリポジトリ同梱で `COPY` によりイメージへ焼き込むが、マウント先は `sounds/user/` のみに絞らず `sounds/` 全体とし、Docker の「ボリュームが空の場合はイメージの中身を初回コピーする」仕様で `default/` も含めて初期化される形にした（`sounds/user/` のみを volume 化する案から変更） | 2026-07-30 |
+| Volume名（3.3） | `time-announcement-db` / `time-announcement-settings` / `time-announcement-sounds`（`external: true`） | 本リポジトリ側で固定名を先に決め、フロントエンド側がそれに合わせる運用で合意。`sounds/` 全体を1volumeにする方針変更に合わせ `time-announcement-sounds-user` から `-user` を外した名前に変更 | 2026-07-30 |
 | イメージビルド（3.4） | builder stage は追加 apt パッケージ**不要**／最終stage は `libportaudio2 libasound2 libasound2-plugins libpulse0` のみ | devcontainer の `.venv` を実査したところ、本プロジェクトの全依存が prebuilt wheel でソースビルドが発生しないことを確認。PortAudio は Linux では ALSA 経由でしか出力できないため、PulseAudio ソケット共有（3.2）を選んでいても ALSA→PulseAudio ブリッジ（`libasound2-plugins`）が必要 | 2026-07-30 |
 | マイグレーションスクリプトの扱い（3.5） | **現状の対話式 (`input()`) のまま**。エントリポイントには含めず、環境構築時に `docker compose run --rm -it app uv run python scripts/migrate_music_db.py` で手動実行する運用を継続 | 非対話化にはアプリ側の改修が必要で今回のDocker化のスコープを超えるため、既存の運用を素直にコンテナに持ち込む方針とした | 2026-07-30 |
 
@@ -108,14 +108,13 @@ services:
 
 ### 3.3 永続化データの扱い
 
-**決定（0章参照）**: `db/music.sqlite3`・`settings/schedules.json`・`sounds/user/` は**すべて named volume 化**する。bind mount ではなく named volume を選んだ理由は、**別リポジトリのフロントエンド（スケジュール編集・楽曲追加UI）が同じデータへ書き込むため**——複数コンテナ間の共有ストレージという、named volume が本来得意とするユースケースに合致するため。
+**決定（0章参照）**: `db/music.sqlite3`・`settings/schedules.json`・`sounds/` は**すべて named volume 化**する。bind mount ではなく named volume を選んだ理由は、**別リポジトリのフロントエンド（スケジュール編集・楽曲追加UI）が同じデータへ書き込むため**——複数コンテナ間の共有ストレージという、named volume が本来得意とするユースケースに合致するため。
 
 | 対象 | 現状 | Docker化での扱い |
 | --- | --- | --- |
 | `db/music.sqlite3`（+ `-shm`/`-wal`） | ローカルファイル、`.gitignore` 対象 | named volume。イメージには焼き込まない。フロントエンド／マイグレーションスクリプト双方から書き込まれる想定 |
 | `settings/schedules.json` | `.gitignore` 対象、環境ごとに手動配置 | named volume。`settings/sample_schedules.json` をイメージに `COPY` しておけば、Docker の「ボリュームが空の場合はイメージの中身を初回コピーする」仕様により `docker compose up` 一発でサンプル設定のまま起動できる。実運用の編集はフロントエンド経由 |
-| `sounds/user/*.wav` | `.gitignore` 対象、環境ごとに追加 | named volume。フロントエンドの楽曲追加機能が書き込む前提 |
-| `sounds/default/*.wav` | リポジトリ同梱 | volume 化しない。実行時に変化しないため `COPY` でイメージに焼き込む |
+| `sounds/`（`default/*.wav` + `user/*.wav`） | `default/*.wav` はリポジトリ同梱、`user/*.wav` は `.gitignore` 対象・環境ごとに追加 | `sounds/` 全体を1つの named volume にする（`sounds/user/` のみを volume 化する案から変更）。`default/*.wav` は引き続き `COPY` でイメージに焼き込むが、mount 先を `sounds/` 全体にすることで、上記 `schedules.json` と同じ「空 volume への初回コピー」仕様により `default/*.wav` も volume 初期化時に自動配置される。フロントエンドの楽曲追加機能は同じ volume の `user/` 配下に書き込む |
 
 **Volume名（決定）**: 本リポジトリ側で固定名を決め、フロントエンド側がそれに合わせる運用となった。`external: true` を付けて Compose のプロジェクト名前空間から独立させる。
 
@@ -123,7 +122,7 @@ services:
 | --- | --- |
 | `time-announcement-db` | `/app/db` |
 | `time-announcement-settings` | `/app/settings` |
-| `time-announcement-sounds-user` | `/app/sounds/user` |
+| `time-announcement-sounds` | `/app/sounds` |
 
 **残る注意点**:
 - 複数コンテナが同一 SQLite ファイルへ同時に書き込む可能性がある場合、SQLite のロック挙動（特に WAL モード時の `-shm`/`-wal`）を踏まえた検証が必要。現状 `main.py` 側は WAL モードを明示していない（[music_db.py](../../src/music_db.py) は `PRAGMA foreign_keys=ON` のみ設定）ため、フロントエンド側の書き込み方式次第では追加確認が要る（5章に残置）。

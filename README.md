@@ -105,14 +105,14 @@ uv run python src/main.py
 
 - 毎分の起動: コンテナ内蔵の [supercronic](https://github.com/aptible/supercronic) が担う（外部 cron 不要）
 - 音声出力: ホストの PulseAudio/PipeWire-pulse ソケットを bind mount して共有
-- 永続化データ（`db/`, `settings/`, `sounds/user/`）: 別リポジトリのフロントエンドと共有する named volume
+- 永続化データ（`db/`, `settings/`, `sounds/`）: 別リポジトリのフロントエンドと共有する named volume
 
 ### 1. named volume を作成（初回のみ）
 
 ```bash
 docker volume create time-announcement-db
 docker volume create time-announcement-settings
-docker volume create time-announcement-sounds-user
+docker volume create time-announcement-sounds
 ```
 
 ### 2. 環境変数を設定
@@ -129,7 +129,7 @@ cp .env.example .env
 docker compose up -d --build
 ```
 
-`settings/schedules.json` が未配置の場合、イメージに焼き込まれた `sample_schedules.json` の内容が named volume の初期化時にコピーされ、サンプル設定のまま起動する。
+`settings/schedules.json` が未配置の場合、イメージに焼き込まれた `sample_schedules.json` の内容が named volume の初期化時にコピーされ、サンプル設定のまま起動する。同様に `sounds/` も未初期化（空）の named volume であれば、イメージに焼き込まれた `sounds/default/*.wav` が初期化時にコピーされる。
 
 ### 4. DB マイグレーション（初回・対話式）
 
