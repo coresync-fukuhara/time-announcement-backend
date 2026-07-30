@@ -10,7 +10,7 @@ services:
     volumes:
       - time-announcement-db:/app/db
       - time-announcement-settings:/app/settings
-      - time-announcement-sounds-user:/app/sounds/user
+      - time-announcement-sounds:/app/sounds
       # ホストの PulseAudio/PipeWire-pulse ソケット。パスは環境依存のため
       # 対象ホストで `pactl info` 等を実行して確認し .env で上書きすること
       - ${PULSE_SOCKET_PATH:-/run/user/1000/pulse/native}:/run/pulse/native
@@ -21,5 +21,5 @@ volumes:
     external: true
   time-announcement-settings:
     external: true
-  time-announcement-sounds-user:
+  time-announcement-sounds:
     external: true
