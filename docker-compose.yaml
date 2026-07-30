@@ -1,0 +1,25 @@
+services:
+  app:
+    build: .
+    image: time-announcement-backend:latest
+    restart: unless-stopped
+    # ホストの音声出力ユーザー（PulseAudio ソケットの所有者）に合わせる
+    user: "${PUID:-1000}:${PGID:-1000}"
+    environment:
+      - PULSE_SERVER=/run/pulse/native
+    volumes:
+      - time-announcement-db:/app/db
+      - time-announcement-settings:/app/settings
+      - time-announcement-sounds-user:/app/sounds/user
+      # ホストの PulseAudio/PipeWire-pulse ソケット。パスは環境依存のため
+      # 対象ホストで `pactl info` 等を実行して確認し .env で上書きすること
+      - ${PULSE_SOCKET_PATH:-/run/user/1000/pulse/native}:/run/pulse/native
+
+volumes:
+  # フロントエンド（別リポジトリ）と共有するため external な named volume として運用する
+  time-announcement-db:
+    external: true
+  time-announcement-settings:
+    external: true
+  time-announcement-sounds-user:
+    external: true

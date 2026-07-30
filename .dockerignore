@@ -1,0 +1,25 @@
+.git
+.github
+.devcontainer
+.claude
+.vscode
+docs
+*.md
+
+.venv
+__pycache__
+*.pyc
+.mypy_cache
+.ruff_cache
+.pytest_cache
+
+apm_modules
+apm.yml
+apm.lock.yaml
+.mcp.json
+
+# ローカルの実データは持ち込まない（named volume 経由で扱う）
+db/*.sqlite3
+db/*.sqlite3-*
+settings/schedules.json
+sounds/user/*.wav
