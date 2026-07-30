@@ -99,6 +99,44 @@ uv run python scripts/migrate_music_db.py
 uv run python src/main.py
 ```
 
+## Docker でのデプロイ
+
+方式の詳細・決定理由は [docs/catchup/docker_deployment_survey.md](docs/catchup/docker_deployment_survey.md) を参照。
+
+- 毎分の起動: コンテナ内蔵の [supercronic](https://github.com/aptible/supercronic) が担う（外部 cron 不要）
+- 音声出力: ホストの PulseAudio/PipeWire-pulse ソケットを bind mount して共有
+- 永続化データ（`db/`, `settings/`, `sounds/user/`）: 別リポジトリのフロントエンドと共有する named volume
+
+### 1. named volume を作成（初回のみ）
+
+```bash
+docker volume create time-announcement-db
+docker volume create time-announcement-settings
+docker volume create time-announcement-sounds-user
+```
+
+### 2. 環境変数を設定
+
+```bash
+cp .env.example .env
+# PULSE_SOCKET_PATH: 対象ホストで `pactl info` 等を実行して実際のソケットパスを確認して設定
+# PUID/PGID: ホストの音声出力ユーザー（上記ソケットの所有者）の UID/GID に合わせる
+```
+
+### 3. 起動
+
+```bash
+docker compose up -d --build
+```
+
+`settings/schedules.json` が未配置の場合、イメージに焼き込まれた `sample_schedules.json` の内容が named volume の初期化時にコピーされ、サンプル設定のまま起動する。
+
+### 4. DB マイグレーション（初回・対話式）
+
+```bash
+docker compose run --rm -it app uv run python scripts/migrate_music_db.py
+```
+
 ## 補足
 
 - スキーマ定義: `settings/schema.json`
