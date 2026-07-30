@@ -1,1 +1,1 @@
-* * * * * cd /app && python src/main.py
+*/5 * * * * cd /app && python src/main.py
