@@ -1,0 +1,46 @@
+#!/bin/bash
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+ENV_FILE=".env"
+EXAMPLE_FILE=".env.example"
+
+if [[ -f "$ENV_FILE" ]]; then
+    read -r -p "${ENV_FILE} は既に存在します。上書きしますか？ [y/N]: " answer
+    case "$answer" in
+        [yY]*) ;;
+        *) echo "中止しました。"; exit 0 ;;
+    esac
+fi
+
+# PULSE_SOCKET_PATH: `pactl info` の Server String から検出する
+socket_path=""
+if command -v pactl >/dev/null 2>&1; then
+    socket_path="$(pactl info 2>/dev/null | sed -n 's/^Server String: //p')"
+    socket_path="${socket_path#unix:}"
+fi
+if [[ -z "$socket_path" ]]; then
+    socket_path="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/pulse/native"
+    echo "警告: pactl でソケットパスを検出できませんでした。既定値 ${socket_path} を使用します。実ホストの値と合っているか確認してください。" >&2
+fi
+
+# PUID/PGID: 上記ソケットの所有者に合わせる。ソケットが見えない場合は現在のユーザーで代用
+if [[ -S "$socket_path" ]]; then
+    puid="$(stat -c '%u' "$socket_path")"
+    pgid="$(stat -c '%g' "$socket_path")"
+else
+    puid="$(id -u)"
+    pgid="$(id -g)"
+    echo "警告: ソケット ${socket_path} の所有者を確認できませんでした。現在のユーザー (uid=${puid}, gid=${pgid}) を使用します。実ホストの音声出力ユーザーと合っているか確認してください。" >&2
+fi
+
+cp "$EXAMPLE_FILE" "$ENV_FILE"
+sed -i \
+    -e "s#^PULSE_SOCKET_PATH=.*#PULSE_SOCKET_PATH=${socket_path}#" \
+    -e "s/^PUID=.*/PUID=${puid}/" \
+    -e "s/^PGID=.*/PGID=${pgid}/" \
+    "$ENV_FILE"
+
+echo "${ENV_FILE} を生成しました:"
+grep -v '^#' "$ENV_FILE" | grep -v '^$'

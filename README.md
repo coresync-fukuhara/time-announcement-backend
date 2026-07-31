@@ -118,10 +118,10 @@ docker volume create time-announcement-sounds
 ### 2. 環境変数を設定
 
 ```bash
-cp .env.example .env
-# PULSE_SOCKET_PATH: 対象ホストで `pactl info` 等を実行して実際のソケットパスを確認して設定
-# PUID/PGID: ホストの音声出力ユーザー（上記ソケットの所有者）の UID/GID に合わせる
+./scripts/generate_env
 ```
+
+`pactl info` の実行結果とソケットの所有者から `PULSE_SOCKET_PATH` / `PUID` / `PGID` を自動検出して `.env` を生成する。自動検出できなかった項目は警告が表示されるので、その場合は `.env.example` を参考に手動で値を確認・修正すること。
 
 ### 3. 起動
 
